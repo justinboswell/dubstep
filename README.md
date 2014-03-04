@@ -8,7 +8,8 @@ DR7: flags:
 
 Bits	Meaning
 * Bits 0-7: Flags for each of the 4 debug registers (2 for each). 
-** (1 << (reg * 2)) = Process, (1 << (reg * 2 + 1)) = Global. Global requires kernel privileges.
+	* (1 << (reg * 2)) = Process, 
+	* (1 << (reg * 2 + 1)) = Global. Global requires kernel privileges. If you are reading this, you don't have them.
 * Bits 16-23 :  2 bits for each register, breakpoint type:
 	* 0x0: Code
 	* 0x1: Write
