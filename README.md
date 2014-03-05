@@ -29,7 +29,7 @@ See the test source for example usage.
 
 * `void dubstep::SetBreakpointHandler(BreakpointHandler handler)`
 	* Installs a callback that will notify you when a breakpoint is hit.
-	* Handler signature: void MyHandler(void* address)
+	* Handler signature: `void MyHandler(void* address)`
 
 ### TODO
 * Install an exception handler to catch the `EXCEPTION_SINGLE_STEP` and do something with it.
