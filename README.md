@@ -22,6 +22,10 @@
 * `bool dubstep::ClearBreakpoint(HANDLE breakpoint)`
 	* Cancels a breakpoint set by `SetBreakpoint`.
 
+### TODO
+* Install an exception handler to catch the `EXCEPTION_SINGLE_STEP` and do something with it.
+* Get this to work while the debugger is attached
+
 ### Debug Registers Reference
 * DR0, DR1, DR2, DR3 breakpoint address
 * DR7: flags:
