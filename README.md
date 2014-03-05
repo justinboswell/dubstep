@@ -1,9 +1,8 @@
-# DuBStep
-
-## A Library for creating hardware execution and data breakpoints at runtime on Win32/Win64
-Everything is implemented in a single header, dubstep.h, for ease of integration.
+# DuBStep 
+##### A Library for creating hardware execution and data breakpoints at runtime on Win32/Win64
 
 ### Usage
+Everything is implemented in a single header, dubstep.h, for ease of integration.
 Simply include dubstep.h into your project somewhere. Note that it will include `<windows.h>`.
 See the test source for example usage.
 
@@ -32,8 +31,7 @@ See the test source for example usage.
 	* Handler signature: `void MyHandler(void* address)`
 
 ### TODO
-* Install an exception handler to catch the `EXCEPTION_SINGLE_STEP` and do something with it.
-* Get this to work while the debugger is attached
+* Get this to work more cleanly while the debugger is attached
 
 ### Debug Registers Reference
 * DR0, DR1, DR2, DR3 breakpoint address
