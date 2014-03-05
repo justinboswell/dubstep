@@ -51,5 +51,5 @@ See the test source for example usage.
 		* 0x3: 4
 
 ### References
-http://en.wikipedia.org/wiki/X86_debug_register
-http://www.codeproject.com/Articles/28071/Toggle-hardware-data-read-execute-breakpoints-prog
+* http://en.wikipedia.org/wiki/X86_debug_register
+* http://www.codeproject.com/Articles/28071/Toggle-hardware-data-read-execute-breakpoints-prog
