@@ -1,11 +1,11 @@
 
 
-#ifndef BREAKPOINT_H_INC
-#define BREAKPOINT_H_INC
+#ifndef DUBSTEP_H_INC
+#define DUBSTEP_H_INC
 
 #include <windows.h>
 
-namespace Breakpoint {
+namespace dubstep {
 
 enum BreakpointType
 {
@@ -197,7 +197,7 @@ namespace internal
 			return 0;
 		}
 	};
-} // namespace Breakpoint::internal
+} // namespace dubstep::internal
 
 HANDLE SetBreakpoint(BreakpointType type, void *address, BreakpointSize size)
 {
@@ -221,6 +221,6 @@ bool ClearBreakpoint(HANDLE bph)
 	return detached;
 }
 
-} // namespace Breakpoint
+} // namespace dubstep
 
-#endif // BREAKPOINT_H_INC
+#endif // DUBSTEP_H_INC
