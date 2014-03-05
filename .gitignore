@@ -1,0 +1,6 @@
+
+*.sdf
+*.suo
+*.opensdf
+project/Debug
+project/Release
