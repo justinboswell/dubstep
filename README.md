@@ -35,6 +35,11 @@ See the test source for example usage.
 
 ### Debug Registers Reference
 * DR0, DR1, DR2, DR3 breakpoint address
+* DR6: Low 4 bits contain the 1-based index of the debug register that tripped
+	* 0x1: DR0
+	* 0x2: DR1
+	* 0x4: DR2
+	* 0x8: DR3
 * DR7: flags:
 	* Bits 0-7: Flags for each of the 4 debug registers (2 for each). 
 		* (1 << (reg * 2)) = Process, 
