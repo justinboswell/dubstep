@@ -1,6 +1,6 @@
+# DuBStep
 
-# A Library for creating hardware execution and data breakpoints at runtime on Win32/Win64
-
+## A Library for creating hardware execution and data breakpoints at runtime on Win32/Win64
 
 ### Debug Registers
 DR0, DR1, DR2, DR3 breakpoint address
