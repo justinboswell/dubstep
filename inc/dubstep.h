@@ -5,6 +5,8 @@
 
 #include <windows.h>
 
+#include <cassert>
+
 namespace dubstep {
 
 enum BreakpointType
@@ -21,6 +23,8 @@ enum BreakpointSize
 	SIZE_4 = 3,
 	SIZE_8 = 2
 };
+
+typedef void (*BreakpointHandler)(void*);
 
 namespace internal
 {
@@ -105,7 +109,7 @@ namespace internal
 
 				CloseThread();
 
-				return Enabled;
+				return Register != -1;
 			}
 			
 			return false;
@@ -196,24 +200,50 @@ namespace internal
 
 			return 0;
 		}
+
+		static LONG WINAPI FilterException(LPEXCEPTION_POINTERS ex)
+		{
+			if (ex->ExceptionRecord->ExceptionCode == EXCEPTION_SINGLE_STEP)
+			{
+				if (Handler)
+					(*Handler)(ex);
+				return EXCEPTION_CONTINUE_EXECUTION;
+			}
+
+			return EXCEPTION_CONTINUE_SEARCH;
+		}
+
+		static BreakpointHandler Handler;
 	};
 } // namespace dubstep::internal
 
+typedef internal::Breakpoint<internal::SCOPE_Process> Breakpoint;
+
+template <internal::Scope S>
+BreakpointHandler internal::Breakpoint<S>::Handler = NULL;
+
+void SetBreakpointHandler(BreakpointHandler handler)
+{
+	Breakpoint::Handler = handler;
+}
+
 HANDLE SetBreakpoint(BreakpointType type, void *address, BreakpointSize size)
 {
-    internal::Breakpoint<internal::SCOPE_Process>* breakpoint = new internal::Breakpoint<internal::SCOPE_Process>(type, address, size);
+    Breakpoint* breakpoint = new Breakpoint(type, address, size);
 	if (!breakpoint->Attach())
 	{
 		delete breakpoint;
 		return 0;
 	}
 
+	::SetUnhandledExceptionFilter(Breakpoint::FilterException);
+
 	return reinterpret_cast<HANDLE>(breakpoint);
 }
 
 bool ClearBreakpoint(HANDLE bph)
 {
-    internal::Breakpoint<internal::SCOPE_Process>* breakpoint = reinterpret_cast<internal::Breakpoint<internal::SCOPE_Process>*>(bph);
+    Breakpoint* breakpoint = reinterpret_cast<Breakpoint*>(bph);
 
 	bool detached = breakpoint->Detach();
 	delete breakpoint;
