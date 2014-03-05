@@ -27,8 +27,9 @@ See the test source for example usage.
 	* Cancels a breakpoint set by `SetBreakpoint`.
 
 * `void dubstep::SetBreakpointHandler(BreakpointHandler handler)`
-	* Installs a callback that will notify you when a breakpoint is hit.
-	* Handler signature: `void MyHandler(void* address)`
+	* Handler signature: `void MyHandler(void* address)` 
+	* Installs a callback that will notify you when a breakpoint is hit. Note that this will make use of `SetUnhandledExceptionFilter()` and will override your filter if you have one. Also, you may stomp the filter if you install it after your first breakpoint after installing the breakpoint handler. Vectored exception handlers do not work on x64, so those are not employed here.
+	
 
 ### TODO
 * Get this to work more cleanly while the debugger is attached
