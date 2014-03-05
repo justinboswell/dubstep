@@ -1,6 +1,11 @@
 # DuBStep
 
 ## A Library for creating hardware execution and data breakpoints at runtime on Win32/Win64
+Everything is implemented in a single header, dubstep.h, for ease of integration.
+
+### Usage
+Simply include dubstep.h into your project somewhere. Note that it will include `<windows.h>`.
+See the test source for example usage.
 
 ### API
 
@@ -21,6 +26,10 @@
 	
 * `bool dubstep::ClearBreakpoint(HANDLE breakpoint)`
 	* Cancels a breakpoint set by `SetBreakpoint`.
+
+* `void dubstep::SetBreakpointHandler(BreakpointHandler handler)`
+	* Installs a callback that will notify you when a breakpoint is hit.
+	* Handler signature: `void MyHandler(void* address)`
 
 ### TODO
 * Install an exception handler to catch the `EXCEPTION_SINGLE_STEP` and do something with it.
@@ -44,4 +53,5 @@
 		* 0x3: 4
 
 ### References
+http://en.wikipedia.org/wiki/X86_debug_register
 http://www.codeproject.com/Articles/28071/Toggle-hardware-data-read-execute-breakpoints-prog
