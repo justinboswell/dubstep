@@ -2,7 +2,12 @@
 
 ## A Library for creating hardware execution and data breakpoints at runtime on Win32/Win64
 
-### Debug Registers
+### API
+
+* HANDLE dubstep::SetBreakpoint(dubstep::BreakpointType type, void* address, dubstep::BreakpointSize size)
+* bool dubstep::ClearBreakpoint(HANDLE breakpoint)
+
+### Debug Registers Reference
 * DR0, DR1, DR2, DR3 breakpoint address
 * DR7: flags:
 	* Bits 0-7: Flags for each of the 4 debug registers (2 for each). 
