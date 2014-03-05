@@ -4,8 +4,23 @@
 
 ### API
 
-* HANDLE dubstep::SetBreakpoint(dubstep::BreakpointType type, void* address, dubstep::BreakpointSize size)
-* bool dubstep::ClearBreakpoint(HANDLE breakpoint)
+* `HANDLE dubstep::SetBreakpoint(dubstep::BreakpointType type, void* address, dubstep::BreakpointSize size)`
+	* Types:
+		* dubstep::TYPE_Exec:   trap when the PC hits this address
+		* dubstep::TYPE_Access: trap data reads and writes
+		* dubstep::TYPE_Write:  trap data writes
+	* Sizes:
+		* dubstep::SIZE_1
+		* dubstep::SIZE_2
+		* dubstep::SIZE_4
+		* dubstep::SIZE_8
+	* Must be called from the thread you wish to monitor. You can have up to 4 active breakpoints per thread.
+	* Returns a HANDLE to the breakpoint which can be passed to `ClearBreakpoint` to cancel it. A return value of 0 indicates that the breakpoint could not be created. Causes:
+		* You do not have permission to `OpenThread` with `THREAD_ALL_ACCESS`
+		* There are no available breakpoint registers
+	
+* `bool dubstep::ClearBreakpoint(HANDLE breakpoint)`
+	* Cancels a breakpoint set by `SetBreakpoint`.
 
 ### Debug Registers Reference
 * DR0, DR1, DR2, DR3 breakpoint address
