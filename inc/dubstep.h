@@ -1,11 +1,30 @@
 
+// The MIT License (MIT)
+//
+// Copyright (c) 2014 Justin Boswell
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+// copies of the Software, and to permit persons to whom the Software is 
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+// THE SOFTWARE.
 
 #ifndef DUBSTEP_H_INC
 #define DUBSTEP_H_INC
 
 #include <windows.h>
-
-#include <cassert>
 
 namespace dubstep {
 
@@ -30,7 +49,7 @@ namespace internal
 {
 	enum Scope
 	{
-		SCOPE_Process,
+		SCOPE_Local,
 		SCOPE_Global, // Need kernel privileges, so unimplemented for now
 	};
 
@@ -94,7 +113,10 @@ namespace internal
 
 			return WriteThreadContext(&RemoveFromThreadContext);
 		}
-
+		
+		// Thread context cannot be written for a thread that is currently running,
+		// therefore spawn a new thread whose only job is to suspend the current
+		// thread, update its context, and resume it.
 		bool WriteThreadContext(LPTHREAD_START_ROUTINE threadProc)
 		{
 			if (OpenThread())
@@ -129,7 +151,7 @@ namespace internal
 
 			// find the first available register
 			int regIdx = -1;
-			for (int idx = 0; idx < 4; ++idx)
+			for (int idx = 1; idx < 4; ++idx)
 			{
 				const unsigned regFlag = (1 << (idx * 2));
 				if ((ctx.Dr7 & regFlag) == 0)
@@ -206,7 +228,19 @@ namespace internal
 			if (ex->ExceptionRecord->ExceptionCode == EXCEPTION_SINGLE_STEP)
 			{
 				if (Handler)
-					(*Handler)(ex);
+				{
+					// Dr6's low bits (0-3) will contain the debug register that tripped
+					unsigned regBit = ex->ContextRecord->Dr6 & 0x0f;
+					void* address = NULL;
+					switch (regBit)
+					{
+						case 1: address = reinterpret_cast<void*>(ex->ContextRecord->Dr0); break;
+						case 2: address = reinterpret_cast<void*>(ex->ContextRecord->Dr1); break;
+						case 4: address = reinterpret_cast<void*>(ex->ContextRecord->Dr2); break;
+						case 8: address = reinterpret_cast<void*>(ex->ContextRecord->Dr3); break;
+					}
+					(*Handler)(address);
+				}
 				return EXCEPTION_CONTINUE_EXECUTION;
 			}
 
@@ -217,7 +251,7 @@ namespace internal
 	};
 } // namespace dubstep::internal
 
-typedef internal::Breakpoint<internal::SCOPE_Process> Breakpoint;
+typedef internal::Breakpoint<internal::SCOPE_Local> Breakpoint;
 
 template <internal::Scope S>
 BreakpointHandler internal::Breakpoint<S>::Handler = NULL;
@@ -236,7 +270,13 @@ HANDLE SetBreakpoint(BreakpointType type, void *address, BreakpointSize size)
 		return 0;
 	}
 
-	::SetUnhandledExceptionFilter(Breakpoint::FilterException);
+	// install the exception filter if user has requested notification
+	static volatile bool filterInstalled = false;
+	if (Breakpoint::Handler && !filterInstalled)
+	{
+		::SetUnhandledExceptionFilter(Breakpoint::FilterException);
+		filterInstalled = true;
+	}
 
 	return reinterpret_cast<HANDLE>(breakpoint);
 }
