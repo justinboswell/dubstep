@@ -7,7 +7,7 @@ Sometimes you need to set breakpoints from code. For example, trapping a buffer 
 
 Once you set a breakpoint, they will trigger in Visual Studio or CDB. If you have data breakpoints set in Visual Studio, the debugger and your code will fight. It's generally best to keep breakpoints to a minimum in VS when trying to use Dubstep to hunt something down. Visual Studio 2012's debugger appears to check the debug registers before stomping on them, but previous versions will just happily overwrite.
 
-Works on: Visual Studio 2008 and newer
+Works on: Visual Studio 2008 and newer. Should work on earlier versions, but they haven't been tested.
 
 ### Usage
 Everything is implemented in a single header, dubstep.h, for ease of integration.
