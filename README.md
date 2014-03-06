@@ -11,7 +11,7 @@ Works on: Visual Studio 2008 and newer
 
 ### Usage
 Everything is implemented in a single header, dubstep.h, for ease of integration.
-Simply include dubstep.h into your project somewhere. Note that it will include `<windows.h>`.
+Simply include [dubstep.h](https://github.com/justinboswell/dubstep/raw/master/inc/dubstep.h) into your project somewhere. Note that it will include `<windows.h>`.
 See the test source for example usage.
 
 ### API
