@@ -1,5 +1,13 @@
-# DuBStep 
+# DuBStep (Dynamic Breakpoint API)
 ##### A Library for creating hardware execution and data breakpoints at runtime on Win32/Win64
+
+### Purpose
+
+Sometimes you need to set breakpoints from code. For example, trapping a buffer overrun by watching the memory after the end of your buffer. Or setting an instruction breakpoint after conditions have been met at runtime. Dubstep lets you do this.
+
+Once you set a breakpoint, they will trigger in Visual Studio or CDB. If you have data breakpoints set in Visual Studio, the debugger and your code will fight. It's generally best to keep breakpoints to a minimum in VS when trying to use Dubstep to hunt something down. Visual Studio 2012's debugger appears to check the debug registers before stomping on them, but previous versions will just happily overwrite.
+
+Works on: Visual Studio 2008 and newer
 
 ### Usage
 Everything is implemented in a single header, dubstep.h, for ease of integration.
@@ -29,10 +37,6 @@ See the test source for example usage.
 * `void dubstep::SetBreakpointHandler(BreakpointHandler handler)`
 	* Handler signature: `void MyHandler(void* address)` 
 	* Installs a callback that will notify you when a breakpoint is hit. Note that this will make use of `SetUnhandledExceptionFilter()` and will override your filter if you have one. Also, you may stomp the filter if you install it after your first breakpoint after installing the breakpoint handler. Vectored exception handlers do not work on x64, so those are not employed here.
-	
-
-### TODO
-* Get this to work more cleanly while the debugger is attached
 
 ### Debug Registers Reference
 * DR0, DR1, DR2, DR3 breakpoint address
@@ -43,7 +47,7 @@ See the test source for example usage.
 	* 0x8: DR3
 * DR7: flags:
 	* Bits 0-7: Flags for each of the 4 debug registers (2 for each). 
-		* (1 << (reg * 2)) = Process, 
+		* (1 << (reg * 2)) = Local/Process, 
 		* (1 << (reg * 2 + 1)) = Global. Global requires kernel privileges. If you are reading this, you don't have them.
 	* Bits 16-23 :  2 bits for each register, breakpoint type:
 		* 0x0: Code
