@@ -259,6 +259,13 @@ BreakpointHandler internal::Breakpoint<S>::Handler = NULL;
 void SetBreakpointHandler(BreakpointHandler handler)
 {
 	Breakpoint::Handler = handler;
+
+	// install the exception filter if user has requested notification,
+	// otherwise clear it
+	if (handler)
+		::SetUnhandledExceptionFilter(Breakpoint::FilterException);
+	else
+		::SetUnhandledExceptionFilter(NULL);
 }
 
 HANDLE SetBreakpoint(BreakpointType type, void *address, BreakpointSize size)
@@ -268,14 +275,6 @@ HANDLE SetBreakpoint(BreakpointType type, void *address, BreakpointSize size)
 	{
 		delete breakpoint;
 		return 0;
-	}
-
-	// install the exception filter if user has requested notification
-	static volatile bool filterInstalled = false;
-	if (Breakpoint::Handler && !filterInstalled)
-	{
-		::SetUnhandledExceptionFilter(Breakpoint::FilterException);
-		filterInstalled = true;
 	}
 
 	return reinterpret_cast<HANDLE>(breakpoint);
