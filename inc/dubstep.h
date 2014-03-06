@@ -252,6 +252,7 @@ namespace internal
 } // namespace dubstep::internal
 
 typedef internal::Breakpoint<internal::SCOPE_Local> Breakpoint;
+typedef DWORD_PTR BreakpointHandle;
 
 template <internal::Scope S>
 BreakpointHandler internal::Breakpoint<S>::Handler = NULL;
@@ -268,7 +269,7 @@ void SetBreakpointHandler(BreakpointHandler handler)
 		::SetUnhandledExceptionFilter(NULL);
 }
 
-HANDLE SetBreakpoint(BreakpointType type, void *address, BreakpointSize size)
+BreakpointHandle SetBreakpoint(BreakpointType type, void *address, BreakpointSize size)
 {
     Breakpoint* breakpoint = new Breakpoint(type, address, size);
 	if (!breakpoint->Attach())
@@ -277,10 +278,10 @@ HANDLE SetBreakpoint(BreakpointType type, void *address, BreakpointSize size)
 		return 0;
 	}
 
-	return reinterpret_cast<HANDLE>(breakpoint);
+	return reinterpret_cast<BreakpointHandle>(breakpoint);
 }
 
-bool ClearBreakpoint(HANDLE bph)
+bool ClearBreakpoint(BreakpointHandle bph)
 {
     Breakpoint* breakpoint = reinterpret_cast<Breakpoint*>(bph);
 

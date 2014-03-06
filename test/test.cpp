@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 
 	dubstep::SetBreakpointHandler(BreakpointHandler);
 
-	HANDLE bp = dubstep::SetBreakpoint(dubstep::TYPE_Access, buf, dubstep::SIZE_4);
+	dubstep::BreakpointHandle bp = dubstep::SetBreakpoint(dubstep::TYPE_Access, buf, dubstep::SIZE_4);
 	assert(bp != 0);
 
 #ifdef DEBUG_EXCEPTION_FILTER
