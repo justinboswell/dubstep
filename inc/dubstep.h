@@ -124,7 +124,7 @@ namespace internal
 				// Create event to signal that context write is complete, create a thread and then wait until
 				// it adds the breakpoint to this thread's context
 				Complete = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-				HANDLE contextWriter = ::CreateThread(NULL, 0, threadProc, static_cast<LPVOID>(this), 0, NULL);
+				::CreateThread(NULL, 0, threadProc, static_cast<LPVOID>(this), 0, NULL);
 				::WaitForSingleObject(Complete, INFINITE);
 				::CloseHandle(Complete);
 				Complete = INVALID_HANDLE_VALUE;
@@ -151,7 +151,7 @@ namespace internal
 
 			// find the first available register
 			int regIdx = -1;
-			for (int idx = 1; idx < 4; ++idx)
+			for (int idx = 0; idx < 4; ++idx)
 			{
 				const unsigned regFlag = (1 << (idx * 2));
 				if ((ctx.Dr7 & regFlag) == 0)
