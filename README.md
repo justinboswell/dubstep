@@ -16,7 +16,7 @@ See the test source for example usage.
 
 ### API
 
-* `HANDLE dubstep::SetBreakpoint(dubstep::BreakpointType type, void* address, dubstep::BreakpointSize size)`
+* `dubstep::BreakpointHandle dubstep::SetBreakpoint(dubstep::BreakpointType type, void* address, dubstep::BreakpointSize size)`
 	* Types:
 		* dubstep::TYPE_Exec:   trap when the PC hits this address
 		* dubstep::TYPE_Access: trap data reads and writes
@@ -31,7 +31,7 @@ See the test source for example usage.
 		* You do not have permission to `OpenThread` with `THREAD_ALL_ACCESS`
 		* There are no available breakpoint registers
 	
-* `bool dubstep::ClearBreakpoint(HANDLE breakpoint)`
+* `bool dubstep::ClearBreakpoint(dubstep::BreakpointHandle breakpoint)`
 	* Cancels a breakpoint set by `SetBreakpoint`.
 
 * `void dubstep::SetBreakpointHandler(BreakpointHandler handler)`
