@@ -1,7 +1,7 @@
 
 // The MIT License (MIT)
 //
-// Copyright (c) 2014 Justin Boswell
+// Copyright (c) 2014 Justin Boswell <justin.boswell@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,14 +52,6 @@ namespace internal
 		SCOPE_Local,
 		SCOPE_Global, // Need kernel privileges, so unimplemented for now
 	};
-
-	// enum RegisterFlags
-	// {
-	// 	REGISTER_0 = 0x0001,
-	// 	REGISTER_1 = 0x0004,
-	// 	REGISTER_2 = 0x0010,
-	// 	REGISTER_3 = 0x0040,
-	// };
 
 	template<Scope S>
 	class Breakpoint
