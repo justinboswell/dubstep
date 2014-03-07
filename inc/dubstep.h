@@ -271,7 +271,7 @@ void SetBreakpointHandler(BreakpointHandler handler)
 
 BreakpointHandle SetBreakpoint(BreakpointType type, void *address, BreakpointSize size)
 {
-    Breakpoint* breakpoint = new Breakpoint(type, address, size);
+	Breakpoint* breakpoint = new Breakpoint(type, address, size);
 	if (!breakpoint->Attach())
 	{
 		delete breakpoint;
@@ -283,7 +283,7 @@ BreakpointHandle SetBreakpoint(BreakpointType type, void *address, BreakpointSiz
 
 bool ClearBreakpoint(BreakpointHandle bph)
 {
-    Breakpoint* breakpoint = reinterpret_cast<Breakpoint*>(bph);
+	Breakpoint* breakpoint = reinterpret_cast<Breakpoint*>(bph);
 
 	bool detached = breakpoint->Detach();
 	delete breakpoint;
