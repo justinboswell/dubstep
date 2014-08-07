@@ -64,3 +64,4 @@ See the test source for example usage.
 * http://en.wikipedia.org/wiki/X86_debug_register
 * [ThreadContext breakpoints in Windows] (http://www.codeproject.com/Articles/28071/Toggle-hardware-data-read-execute-breakpoints-prog)
 * [Mac OSX] (http://stackoverflow.com/questions/2604439/how-do-i-write-x86-debug-registers-from-user-space-on-osx)
+* [Linux] (http://www.alexonlinux.com/how-debugger-works)
