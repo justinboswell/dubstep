@@ -1,4 +1,3 @@
-
 // The MIT License (MIT)
 //
 // Copyright (c) 2014 Justin Boswell <justin.boswell@gmail.com>
@@ -24,7 +23,14 @@
 #ifndef DUBSTEP_H_INC
 #define DUBSTEP_H_INC
 
+#if defined(_MSC_VER) || defined(WIN32)
+#define DUBSTEP_PLATFORM_WINDOWS
 #include <windows.h>
+#elif defined(__linux__) || defined(LINUX)
+#define DUBSTEP_PLATFORM_LINUX
+#elif defined(__APPLE__)
+#define DUBSTEP_PLATFORM_OSX
+#endif
 
 namespace dubstep {
 
@@ -53,26 +59,43 @@ namespace internal
 		SCOPE_Global, // Need kernel privileges, so unimplemented for now
 	};
 
-	template<Scope S>
-	class Breakpoint
+	struct BreakpointBase
 	{
-	public:
 		BreakpointType Type;
 		BreakpointSize Size;
 		void* Address;
-		HANDLE Thread;
-		HANDLE Complete;
 		volatile bool Enabled;
 		int Register;
+		
+		BreakpointBase(BreakpointType type, void* address, BreakpointSize size)
+			: Type(type)
+			, Size(size)
+			, Address(address)
+			, Register(-1)
+			, Enabled(false)
+		{
+		}
+
+		virtual ~BreakpointBase() {}
+
+		virtual void Attach() = 0;
+		virtual void Detach() = 0;
+
+		static BreakpointHandler Handler;
+	};
+
+#if defined(DUBSTEP_PLATFORM_WINDOWS)
+	template<Scope S>
+	struct Breakpoint : public BreakpointBase
+	{
+		HANDLE Thread;
+		HANDLE Complete;
+
 
 		Breakpoint(BreakpointType type, void* address, BreakpointSize size)
-		: Type(type)
-		, Size(size)
-		, Address(address)
-		, Thread(INVALID_HANDLE_VALUE)
-		, Complete(INVALID_HANDLE_VALUE)
-		, Register(-1)
-		, Enabled(false)
+			: BreakpointBase(type, address, size)
+			, Thread(INVALID_HANDLE_VALUE)
+			, Complete(INVALID_HANDLE_VALUE)
 		{
 		}
 
@@ -92,14 +115,14 @@ namespace internal
 			::CloseHandle(Thread);
 		}
 
-		bool Attach()
+		virtual bool Attach()
 		{
 			Enabled = true;
 
 			return WriteThreadContext(&AddToThreadContext);
 		}
 
-		bool Detach()
+		virtual bool Detach()
 		{
 			Enabled = false;
 
@@ -238,13 +261,58 @@ namespace internal
 
 			return EXCEPTION_CONTINUE_SEARCH;
 		}
-
-		static BreakpointHandler Handler;
 	};
+#elif defined(DUBSTEP_PLATFORM_LINUX)
+	template <Scope S>
+	struct Breakpoint : public BreakpointBase
+	{
+		Breakpoint(BreakpointType type, void* address, BreakpointSize size)
+			: BreakpointBase(type, address, size)
+		{
+		}
+
+		virtual bool Attach()
+		{
+			Enabled = true;
+
+			return true;
+		}
+
+		virtual bool Detach()
+		{
+			Enabled = false;
+
+			return true;
+		}
+	};
+#elif defined(DUBSTEP_PLATFORM_OSX)
+	template <Scope S>
+	struct Breakpoint: public BreakpointBase
+	{
+		Breakpoint(BreakpointType type, void* address, BreakpointSize size)
+			: BreakpointBase(type, address, size)
+		{
+		}
+
+		virtual bool Attach()
+		{
+			Enabled = true;
+
+			return true;
+		}
+
+		virtual bool Detach()
+		{
+			Enabled = false;
+
+			return true;
+		}
+	};
+#endif
 } // namespace dubstep::internal
 
 typedef internal::Breakpoint<internal::SCOPE_Local> Breakpoint;
-typedef DWORD_PTR BreakpointHandle;
+typedef void* BreakpointHandle;
 
 template <internal::Scope S>
 BreakpointHandler internal::Breakpoint<S>::Handler = NULL;
