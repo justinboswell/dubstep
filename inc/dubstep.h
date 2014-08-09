@@ -28,6 +28,10 @@
 #include <windows.h>
 #elif defined(__linux__) || defined(LINUX)
 #define DUBSTEP_PLATFORM_LINUX
+#include <sys/ptrace.h>
+#include <sys/user.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #elif defined(__APPLE__)
 #define DUBSTEP_PLATFORM_OSX
 #endif
@@ -274,7 +278,30 @@ namespace internal
 		virtual bool Attach()
 		{
 			Enabled = true;
+			
+			pid_t pid = getpid();
+			pid_t tracer = 0;
 
+			if ((tracer = fork()) == 0)
+			{
+				unsigned long dr7 = 0; // TODO
+				struct user u = {0};
+				if (ptrace(PTRACE_ATTACH, pid, NULL, NULL) != 0)
+					exit(1);
+				if (ptrace(PTRACE_POKEUSER, pid, offsetof(struct user, u_debugreg[0], address) != 0)
+					exit(2);
+				if (ptrace(PTRACE_POKEUSER, pid, offsetof(struct user, u_debugreg[7], dr7) != 0)
+					exit(4);
+				if (ptrace(PTRACE_DETACH, pid, NULL, NULL) != 0)
+					exit(8);
+				exit(0);
+			}
+			
+			int tracerExit = 0;
+			waitpid(tracer, &tracerExit, 0);
+			if (WEXITSTATUS(tracerExit) != 0)
+				return false;
+				
 			return true;
 		}
 
@@ -282,6 +309,27 @@ namespace internal
 		{
 			Enabled = false;
 
+			pid_t pid = getpid();
+			pid_t tracer = 0;
+			if ((tracer = fork()) == 0)
+			{
+				unsigned long dr7 = 0; // TODO
+				struct user u = {0};
+				if (ptrace(PTRACE_ATTACH, pid, NULL, NULL) != 0)
+					exit(1);
+				if (ptrace(PTRACE_POKEUSER, pid, offsetof(struct user, u_debugreg[0], Address) != 0)
+					exit(2);
+				if (ptrace(PTRACE_POKEUSER, pid, offsetof(struct user, u_debugreg[7], dr7) != 0)
+					exit(4);
+				if (ptrace(PTRACE_DETACH, pid, NULL, NULL) != 0)
+					exit(8);
+				exit(0);
+			}
+			
+			int tracerExit = 0;
+			waitpid(tracer, &tracerExit, 0);
+			if (WEXITSTATUS(tracerExit) != 0)
+				return false;
 			return true;
 		}
 	};
